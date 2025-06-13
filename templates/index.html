@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- ✅ iPhone-style Switch -->
+  <label class="switch">
+    <input type="checkbox" id="themeToggle">
+    <span class="slider">
+      <i class="fa-solid fa-sun sun-icon"></i>
+      <i class="fa-solid fa-moon moon-icon"></i>
+    </span>
+  </label>
+
+  <div class="container">
+    <h1>📝 To-Do List</h1>
+
+    <!-- 🆕 Task Input Form with Due Date and Priority -->
+    <form action="/add" method="POST">
+      <input type="text" name="content" placeholder="Add new task" required />
+      <input type="datetime-local" name="due_date" />
+      <select name="priority" required>
+        <option value="High">🔥 High</option>
+        <option value="Medium" selected>⚖️ Medium</option>
+        <option value="Low">🧘 Low</option>
+      </select>
+      <button type="submit">+</button>
+    </form>
+
+    <ul>
+      {% for task in tasks %}
+      <li class="{{ 'completed' if task.completed else '' }} priority-{{ task.priority | lower }}">
+        <div>
+          <strong>{{ task.content }}</strong>
+          {% if task.due_date %}
+          <small class="task-due" style="display:block;">⏰ Due: {{ task.due_date.strftime('%Y-%m-%d %H:%M') }}</small>
+          {% endif %}
+          <small style="display:block;">🎯 Priority: {{ task.priority }}</small>
+        </div>
+        <div class="icons">
+          <a href="/complete/{{ task.id }}" title="Toggle Complete"><i class="fa-solid fa-circle-check"></i></a>
+          <a href="/delete/{{ task.id }}" title="Delete Task"><i class="fa-regular fa-trash-can"></i></a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- ✅ JavaScript to toggle theme and remember it -->
+  <script>
+    const toggle = document.getElementById('themeToggle');
+
+    // ⬅️ Load saved theme on page load
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+      toggle.checked = true;
+    }
+
+    // ⬅️ Save theme when toggled
+    toggle.addEventListener('change', () => {
+      if (toggle.checked) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('theme', 'light');
+      }
+    });
+  </script>
+
+</body>
+</html>
